@@ -451,6 +451,110 @@ In addition to restoring full VMs or disks, HYCU can also be used to directly re
 
    HYCU provides flexibility for restoring Nutanix VMs, VGs, and file data while maintaining very simple "Prism-like" workflows. HYCU takes advantage of native Nutanix storage APIs to allow for fast and efficient backup and restore operations.
 
+
+.. _hycu-objects:
+Configuring Nutanix Objects as a Target
++++++++++++++++++++++++++++++++++++++++
+
+HYCU supports the ability to backup workloads to S3-compatible object store. This is a prime use case for Nutanix Objects and one way in which we accommodate large backup workloads with Nutanix Mine - we size an initial Mine Secondary Storage cluster, and a separate Nutanix Objects cluster which can be configured as a target within HYCU.  Configuring Objects within HYCU is simple and straightforward and there's little to no performance penalty for using on-prem objects relative to using a traditional iSCSI backup target
+
+.. note:: To save time, we have already enabled Objects within Prism Central and pre-staged an object store named "ntnx-objects." We will create our Bucket within that object store
+
+Create Access Keys
+..................
+
+#. Navigate to Prism Central > Services > Objects
+
+#. Click on "Access Keys" in the top left menu
+
+#. Click on "+ Add People," then select "Add people not in a directory service," then specify the name "hycu@ntnxlab.local." Click Next
+
+   .. note:: You can configure a directory service for user authentication here rather than local users
+
+   .. figure:: images/32.png
+
+#. Click Download Keys to download the user authentication key to your local machine. Then click Close.  We will use these keys later when we configure a bucket within HYCU
+
+   .. figure:: images/33.png
+
+Configuring a Bucket
+....................
+
+#. Click on "ntnx-objects," then select "Create Bucket"
+
+#. Name the bucket "hycu-bucket" and leave the default options. Then click "Create"
+
+   .. figure:: images/34.png
+
+#. Once created, click on the bucket and select "User Access," then click the "Edit User Access"
+
+#. Type "hcyu@ntnxlab.local" and select both the "Read" and "Write" options, then click Save
+
+   .. figure:: images/35.png
+
+
+Configure Nutanix Objects within HYCU
+.....................................
+
+#. In a new browser tab, navigate back to the HYCU interface and login (if required). Recall that the HYCU web interface listens on HTTPS using TCP port 8443
+
+#. Navigate to Targets in the left-hand menu
+
+   .. figure:: images/36.png
+
+#. Click the "+ Add" button towards the top right
+
+#. Name the target "NTNX_Objects"
+
+#. Tick the option "Use for Archiving"
+
+#. Under Type, specify "AWS S3/Compatible"
+
+#. For the service endpoint, specify http://[objects client used IP]. This IP can be found within Prism Central when you click on the object store
+
+   .. figure:: images/37.png
+
+#. For Bucket Name, specify "hycu-bucket"
+
+#. Retrieve the Access Key ID and Secret Access Key from the file you downloaded earlier when configuring the user within Nutanix Objects. Click "Save"
+
+   .. figure:: images/38.png
+
+You can now modify existing HYCU policies or create new policies which "tier-off" backups to Objects
+
+#. Navigate to Policies using the menu to the left
+
+#. Click on "Archving" from the top right menu which will open the Archiving Prompt. Then click + New
+
+#. Name the Archvial entry "NTNX_Objects"
+
+#. Choose the "NTNX_Objects" target we previously configured
+
+   .. figure:: images/39.png
+
+#. Click Save
+
+#. Click "+ New" to create a new Backup Policy
+
+#. Specify the following details:
+
+   - Name: Platinum
+   - Description: Backup every 2h, recover within 2h, archive weekly
+   - Enabled Options: Backup, Archiving
+   - Backup
+      - Backup Every: 2 Hours
+      - Recover Within: 2 Hours
+      - Retention: 4 Weeks
+      - Targets: Nutanix_Target
+      - Backup Threshold: 25%
+   - Archiving
+      - Data Archive: NTNX_Objects
+
+   .. figure:: images/40.png
+
+#. Click Save
+
+
 .. _hycu-files:
 
 (Optional) Nutanix Files Integration
