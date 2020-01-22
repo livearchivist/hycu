@@ -467,13 +467,15 @@ Create Access Keys
 
 #. Click on "Access Keys" in the top left menu
 
-#. Click on "+ Add People," then select "Add people not in a directory service," then specify the name "hycu@ntnxlab.local." Click Next
+#. Click on "+ Add People," then select "Add people not in a directory service," then specify the name "hycu-YOURINITIALS@ntnxlab.local." Click Next
 
    .. note:: You can configure a directory service for user authentication here rather than local users
 
    .. figure:: images/32.png
 
 #. Click Download Keys to download the user authentication key to your local machine. Then click Close.  We will use these keys later when we configure a bucket within HYCU
+
+   .. note:: Your API keys will only be shown once in the browser, ensure you download them or copy to a text file. Otherwise you must regenerate them.
 
    .. figure:: images/33.png
 
@@ -488,7 +490,7 @@ Configuring a Bucket
 
 #. Once created, click on the bucket and select "User Access," then click the "Edit User Access"
 
-#. Type "hcyu@ntnxlab.local" and select both the "Read" and "Write" options, then click Save
+#. Type "hcyu-YOURINITIALS@ntnxlab.local" and select both the "Read" and "Write" options, then click Save
 
    .. figure:: images/35.png
 
